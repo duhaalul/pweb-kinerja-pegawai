@@ -1,0 +1,48 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+<div class="mb-6">
+  <h2 class="text-2xl font-bold">Kumpulkan Tugas</h2>
+  <p class="text-muted-foreground text-sm"><%= tugas.title %></p>
+</div>
+
+<% if (errors.length > 0) { %>
+<div class="mb-4 p-3 rounded-md bg-destructive/15 text-destructive border border-destructive/30 text-sm">
+  <ul class="list-disc pl-4"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul>
+</div>
+<% } %>
+
+<% if (existing && existing.description && existing.description.includes('[Revisi:')) { %>
+<div class="mb-4 p-3 rounded-md bg-orange-500/15 text-orange-700 border border-orange-500/30 text-sm">
+  ⚠️ Tugasmu mendapat catatan revisi dari pimpinan. Silakan perbaiki dan kirim ulang.
+</div>
+<% } %>
+
+<div data-slot="card" class="rounded-xl border bg-card shadow-sm p-6 max-w-2xl">
+  <form action="/tugas/<%= tugas.id %>/submit" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Deskripsi Hasil Kerja <span class="text-destructive">*</span></label>
+      <textarea name="description" rows="5" required placeholder="Jelaskan hasil kerja kamu..."
+        class="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring resize-none"><%= existing ? existing.description : '' %></textarea>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Link Tautan (opsional)</label>
+      <input type="url" name="link" placeholder="https://..."
+        class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring"/>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">File Lampiran (opsional)</label>
+      <input type="file" name="attachment" accept=".pdf,.doc,.docx,.png,.jpg,.zip"
+        class="h-9 rounded-md border border-input bg-background px-3 py-1.5 text-sm outline-none focus-visible:border-ring"/>
+      <p class="text-xs text-muted-foreground">Format: PDF, DOC, DOCX, PNG, JPG, ZIP</p>
+    </div>
+    <div class="flex gap-2 pt-2">
+      <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 transition-all">
+        Kirim Tugas
+      </button>
+      <a href="/tugas/pegawai" class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent h-9 px-4 transition-all">
+        Batal
+      </a>
+    </div>
+  </form>
+</div>
+<%- include('../partials/footer') %>

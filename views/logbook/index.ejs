@@ -1,0 +1,62 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h2>Logbook Saya</h2>
+    <p>Catatan kegiatan harian kamu</p>
+  </div>
+  <a href="/logbook/create" class="btn btn-primary">+ Tambah Logbook</a>
+</div>
+
+<form method="GET" class="filter-bar">
+  <input type="text" name="search" value="<%= search %>" placeholder="Cari kegiatan..." class="form-input" style="width:260px"/>
+  <button type="submit" class="btn btn-primary">Cari</button>
+</form>
+
+<div class="card">
+  <div class="item-list">
+    <% logbooks.forEach(lb => { %>
+    <div class="item-row" style="align-items:flex-start">
+      <div class="item-info">
+        <div class="item-title">
+          <%= new Date(lb.progress_date).toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) %>
+        </div>
+        <div style="font-size:13px;color:var(--text-2);margin-top:6px;white-space:pre-line;line-height:1.6">
+          <%= lb.description %>
+        </div>
+        <% if (lb.attachment) { %>
+        <a href="/uploads/<%= lb.attachment %>" target="_blank"
+          style="font-size:12px;color:var(--accent);margin-top:6px;display:inline-flex;align-items:center;gap:4px;text-decoration:none">
+          ↓ Lampiran
+        </a>
+        <% } %>
+      </div>
+      <div class="item-actions" style="align-items:flex-start;padding-top:2px;flex-shrink:0">
+        <span class="badge <%= lb.status==='completed'?'badge-success':'badge-warning' %>">
+          <%= lb.status==='completed'?'Disetujui':'Pending' %>
+        </span>
+        <% if (lb.status !== 'completed') { %>
+        <a href="/logbook/<%= lb.id %>/edit" class="btn btn-outline btn-xs">Edit</a>
+        <form action="/logbook/<%= lb.id %>/delete" method="POST" onsubmit="return confirm('Hapus logbook ini?')">
+          <button type="submit" class="btn btn-danger btn-xs">Hapus</button>
+        </form>
+        <% } %>
+      </div>
+    </div>
+    <% }) %>
+    <% if (logbooks.length === 0) { %>
+    <div class="empty-state"><p>Belum ada logbook. <a href="/logbook/create">Tambah sekarang</a></p></div>
+    <% } %>
+  </div>
+</div>
+
+<% if (totalPages > 1) { %>
+<div class="pagination">
+  <% for(let i=1; i<=totalPages; i++) { %>
+  <a href="?page=<%= i %>&search=<%= search %>" class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
+  <% } %>
+</div>
+<% } %>
+
+<%- include('../partials/footer') %>

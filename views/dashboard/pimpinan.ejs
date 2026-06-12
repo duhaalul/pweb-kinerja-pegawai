@@ -1,0 +1,102 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<div class="hero-banner">
+  <div class="hero-eyebrow">Sistem Informasi</div>
+  <h2>Dashboard Pimpinan</h2>
+  <p>Pusat kendali dan monitoring kinerja pegawai. Kelola penugasan, pantau progres, dan tinjau logbook aktivitas harian.</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue">📋</div>
+    <div class="stat-data"><div class="stat-label">Total Penugasan</div><div class="stat-value"><%= stats.totalTugas %></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">✓</div>
+    <div class="stat-data"><div class="stat-label">Selesai</div><div class="stat-value" style="color:var(--success)"><%= stats.tugasSelesai %></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">◎</div>
+    <div class="stat-data"><div class="stat-label">Sedang Berjalan</div><div class="stat-value" style="color:var(--accent)"><%= stats.tugasProses %></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon yellow">○</div>
+    <div class="stat-data"><div class="stat-label">Belum Dimulai</div><div class="stat-value" style="color:var(--warning)"><%= stats.tugasBelum %></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">▤</div>
+    <div class="stat-data"><div class="stat-label">Total Logbook</div><div class="stat-value"><%= stats.totalLogbook %></div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">!</div>
+    <div class="stat-data"><div class="stat-label">Logbook Pending</div><div class="stat-value" style="color:var(--orange)"><%= stats.logbookPending %></div></div>
+  </div>
+</div>
+
+<div class="btn-group" style="margin-bottom:24px">
+  <a href="/tugas/create" class="btn btn-primary">+ Tambah Penugasan</a>
+  <a href="/tugas/export/excel" class="btn btn-outline">↓ Export Excel</a>
+  <a href="/logbook/pimpinan" class="btn btn-outline">Logbook Pegawai</a>
+  <a href="/dashboard/monitoring" class="btn btn-outline">Monitoring</a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Penugasan Terbaru</h3>
+    <a href="/tugas">Lihat semua →</a>
+  </div>
+  <div class="item-list">
+    <% recentTugas.forEach(t => { %>
+    <div class="item-row">
+      <div class="item-info">
+        <div class="item-title"><%= t.title %></div>
+        <div class="item-meta"><%= t.assigned_to_name || '—' %></div>
+      </div>
+      <div class="item-actions">
+        <span class="badge <%= t.status==='completed'?'badge-success':t.status==='in_progress'?'badge-accent':'badge-gray' %>">
+          <%= t.status==='completed'?'Selesai':t.status==='in_progress'?'Berjalan':'Assigned' %>
+        </span>
+        <a href="/tugas/<%= t.id %>/detail" class="btn btn-outline btn-xs">Detail</a>
+        <a href="/tugas/<%= t.id %>/edit" class="btn btn-outline btn-xs">Edit</a>
+        <form action="/tugas/<%= t.id %>/delete" method="POST" onsubmit="return confirm('Hapus penugasan ini?')">
+          <button type="submit" class="btn btn-danger btn-xs">Hapus</button>
+        </form>
+        <% if (t.status === 'in_progress') { %>
+        <button class="btn btn-orange btn-xs" onclick="bukaRevisi('<%= t.id %>')">Revisi</button>
+        <% } %>
+      </div>
+    </div>
+    <% }) %>
+    <% if (recentTugas.length === 0) { %>
+    <div class="empty-state"><p>Belum ada penugasan. <a href="/tugas/create">Tambah sekarang</a></p></div>
+    <% } %>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalRevisi">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Kirim Catatan Revisi</h3>
+      <button class="modal-close" onclick="tutupRevisi()">×</button>
+    </div>
+    <form id="formRevisi" method="POST">
+      <input type="hidden" name="progress_id" value="0"/>
+      <div class="form-group">
+        <label class="form-label">Catatan Revisi <span class="req">*</span></label>
+        <textarea name="catatan" class="form-textarea" required placeholder="Tuliskan catatan revisi untuk pegawai..."></textarea>
+        <span class="form-hint">Catatan ini akan terlihat oleh pegawai.</span>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-orange">Kirim Revisi</button>
+        <button type="button" class="btn btn-outline" onclick="tutupRevisi()">Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function bukaRevisi(id) { document.getElementById('formRevisi').action='/tugas/'+id+'/revisi'; document.getElementById('modalRevisi').classList.add('open'); }
+function tutupRevisi() { document.getElementById('modalRevisi').classList.remove('open'); }
+document.getElementById('modalRevisi').addEventListener('click',function(e){if(e.target===this)tutupRevisi();});
+</script>
+<%- include('../partials/footer') %>

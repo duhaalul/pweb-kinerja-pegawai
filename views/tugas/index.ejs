@@ -1,0 +1,81 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h2>Kelola Penugasan</h2>
+    <p>Daftar semua penugasan pegawai</p>
+  </div>
+  <div class="btn-group">
+    <a href="/tugas/export/excel" class="btn btn-outline">↓ Export Excel</a>
+    <a href="/tugas/create" class="btn btn-primary">+ Tambah Tugas</a>
+  </div>
+</div>
+
+<form method="GET" class="filter-bar">
+  <input type="text" name="search" value="<%= search %>" placeholder="Cari judul atau pegawai..." class="form-input" style="width:280px"/>
+  <button type="submit" class="btn btn-primary">Cari</button>
+  <a href="/tugas" class="btn btn-outline">Reset</a>
+</form>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Judul</th>
+          <th>Pegawai</th>
+          <th>Prioritas</th>
+          <th>Tenggat</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% tugas.forEach(t => { %>
+        <tr>
+          <td class="td-bold"><%= t.title %></td>
+          <td class="td-muted"><%= t.assigned_to_name || '—' %></td>
+          <td>
+            <span class="badge <%= t.priority==='high'?'badge-danger':t.priority==='medium'?'badge-warning':'badge-success' %>">
+              <%= t.priority==='high'?'Tinggi':t.priority==='medium'?'Sedang':'Rendah' %>
+            </span>
+          </td>
+          <td class="td-muted"><%= t.due_date ? new Date(t.due_date).toLocaleDateString('id-ID') : '—' %></td>
+          <td>
+            <span class="badge <%= t.status==='completed'?'badge-success':t.status==='in_progress'?'badge-accent':'badge-gray' %>">
+              <%= t.status==='completed'?'Selesai':t.status==='in_progress'?'Berjalan':'Assigned' %>
+            </span>
+          </td>
+          <td>
+            <div class="btn-group">
+              <a href="/tugas/<%= t.id %>/detail" class="btn btn-outline btn-xs">Detail</a>
+              <a href="/tugas/<%= t.id %>/edit" class="btn btn-outline btn-xs">Edit</a>
+              <form action="/tugas/<%= t.id %>/delete" method="POST" onsubmit="return confirm('Hapus penugasan ini?')">
+                <button type="submit" class="btn btn-danger btn-xs">Hapus</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (tugas.length === 0) { %>
+        <tr>
+          <td colspan="6">
+            <div class="empty-state"><p>Belum ada penugasan. <a href="/tugas/create">Tambah sekarang</a></p></div>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (totalPages > 1) { %>
+<div class="pagination">
+  <% for(let i=1; i<=totalPages; i++) { %>
+  <a href="?page=<%= i %>&search=<%= search %>" class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
+  <% } %>
+</div>
+<% } %>
+
+<%- include('../partials/footer') %>

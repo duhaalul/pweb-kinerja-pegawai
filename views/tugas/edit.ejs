@@ -1,0 +1,70 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+<div class="mb-6">
+  <h2 class="text-2xl font-bold">Edit Penugasan</h2>
+</div>
+
+<% if (errors.length > 0) { %>
+<div class="mb-4 p-3 rounded-md bg-destructive/15 text-destructive border border-destructive/30 text-sm">
+  <ul class="list-disc pl-4"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul>
+</div>
+<% } %>
+
+<div data-slot="card" class="rounded-xl border bg-card shadow-sm p-6 max-w-2xl">
+  <form action="/tugas/<%= tugas.id %>/edit" method="POST" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Judul Tugas <span class="text-destructive">*</span></label>
+      <input type="text" name="title" value="<%= tugas.title %>" required
+        class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring"/>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Deskripsi</label>
+      <textarea name="description" rows="3"
+        class="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring resize-none"><%= tugas.description || '' %></textarea>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Pegawai</label>
+      <select name="assigned_to" class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring">
+        <% employees.forEach(e => { %>
+        <option value="<%= e.id %>" <%= e.id == tugas.assigned_to ? 'selected' : '' %>><%= e.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium">Tanggal Mulai</label>
+        <input type="date" name="start_date" value="<%= tugas.start_date ? new Date(tugas.start_date).toISOString().split('T')[0] : '' %>"
+          class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring"/>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium">Tenggat</label>
+        <input type="date" name="due_date" value="<%= tugas.due_date ? new Date(tugas.due_date).toISOString().split('T')[0] : '' %>"
+          class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring"/>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium">Prioritas</label>
+        <select name="priority" class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring">
+          <option value="low" <%= tugas.priority==='low'?'selected':'' %>>Low</option>
+          <option value="medium" <%= tugas.priority==='medium'?'selected':'' %>>Medium</option>
+          <option value="high" <%= tugas.priority==='high'?'selected':'' %>>High</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium">Status</label>
+        <select name="status" class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring">
+          <option value="assigned" <%= tugas.status==='assigned'?'selected':'' %>>Assigned</option>
+          <option value="in_progress" <%= tugas.status==='in_progress'?'selected':'' %>>In Progress</option>
+          <option value="completed" <%= tugas.status==='completed'?'selected':'' %>>Completed</option>
+          <option value="cancelled" <%= tugas.status==='cancelled'?'selected':'' %>>Cancelled</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex gap-2 pt-2">
+      <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 transition-all">Simpan</button>
+      <a href="/tugas" class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent h-9 px-4 transition-all">Batal</a>
+    </div>
+  </form>
+</div>
+<%- include('../partials/footer') %>

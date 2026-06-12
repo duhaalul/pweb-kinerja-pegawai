@@ -1,0 +1,84 @@
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">KP</div>
+      <div class="brand-text">
+        <h1>Kinerja Pegawai</h1>
+        <p><%= user.role === 'pimpinan' ? 'Panel Pimpinan' : 'Panel Pegawai' %></p>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="nav-link">
+        <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/></svg>
+        Dashboard
+      </a>
+      <% if (user.role === 'pimpinan') { %>
+      <div class="nav-section">Penugasan</div>
+      <a href="/tugas" class="nav-link">
+        <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Kelola Penugasan
+      </a>
+      <a href="/dashboard/monitoring" class="nav-link">
+        <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Monitoring
+      </a>
+      <div class="nav-section">Logbook</div>
+      <a href="/logbook/pimpinan" class="nav-link">
+        <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 5h6M5 8h6M5 11h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Logbook Pegawai
+      </a>
+      <% } else { %>
+      <div class="nav-section">Tugas Saya</div>
+      <a href="/tugas/pegawai" class="nav-link">
+        <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Daftar Tugas
+      </a>
+      <div class="nav-section">Logbook</div>
+      <a href="/logbook" class="nav-link">
+        <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><rect x="2" y="1" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 5h6M5 8h6M5 11h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Logbook Saya
+      </a>
+      <% } %>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+        <div class="user-info">
+          <div class="user-name"><%= user.name %></div>
+          <div class="user-role"><%= user.role === 'pimpinan' ? 'Pimpinan' : 'Pegawai' %></div>
+        </div>
+      </div>
+      <a href="/logout" class="logout-btn">
+        <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Keluar Sistem
+      </a>
+    </div>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button onclick="toggleSidebar()" id="menuBtn" style="display:none;background:none;border:none;cursor:pointer;padding:6px;border-radius:6px;color:var(--text-2)">
+          <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><path d="M2 4h14M2 9h14M2 14h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <span class="topbar-breadcrumb">Sistem Informasi Kinerja Pegawai</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-user-chip">
+          <svg width="12" height="12" fill="currentColor" viewBox="0 0 12 12"><circle cx="6" cy="4" r="2.5"/><path d="M1 10.5c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+          <%= user.name %>
+        </div>
+        <a href="/logout" class="topbar-logout">
+          <svg width="13" height="13" fill="none" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Keluar
+        </a>
+      </div>
+    </header>
+    <div class="page-content">
+      <% if (locals.flashSuccess) { %>
+      <div class="alert alert-success" style="margin-bottom:18px">✓ &nbsp;<%= flashSuccess %></div>
+      <% } %>
+      <% if (locals.flashError) { %>
+      <div class="alert alert-danger" style="margin-bottom:18px">✕ &nbsp;<%= flashError %></div>
+      <% } %>

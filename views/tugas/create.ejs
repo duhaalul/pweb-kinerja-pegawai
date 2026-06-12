@@ -1,0 +1,70 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+<div class="mb-6">
+  <h2 class="text-2xl font-bold">Tambah Penugasan</h2>
+  <p class="text-muted-foreground text-sm">Buat penugasan baru untuk pegawai</p>
+</div>
+
+<% if (errors.length > 0) { %>
+<div class="mb-4 p-3 rounded-md bg-destructive/15 text-destructive border border-destructive/30 text-sm">
+  <ul class="list-disc pl-4">
+    <% errors.forEach(e => { %><li><%= e %></li><% }) %>
+  </ul>
+</div>
+<% } %>
+
+<div data-slot="card" class="rounded-xl border bg-card shadow-sm p-6 max-w-2xl">
+  <form action="/tugas/create" method="POST" class="flex flex-col gap-4">
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Judul Tugas <span class="text-destructive">*</span></label>
+      <input type="text" name="title" required placeholder="Judul penugasan..."
+        class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"/>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Deskripsi</label>
+      <textarea name="description" rows="3" placeholder="Deskripsi tugas..."
+        class="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 resize-none"></textarea>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Pegawai <span class="text-destructive">*</span></label>
+      <select name="assigned_to" required
+        class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring">
+        <option value="">-- Pilih Pegawai --</option>
+        <% employees.forEach(e => { %>
+        <option value="<%= e.id %>"><%= e.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium">Tanggal Mulai</label>
+        <input type="date" name="start_date"
+          class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring"/>
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-sm font-medium">Tenggat</label>
+        <input type="date" name="due_date"
+          class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring"/>
+      </div>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <label class="text-sm font-medium">Prioritas <span class="text-destructive">*</span></label>
+      <select name="priority" required
+        class="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring">
+        <option value="">-- Pilih Prioritas --</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+    <div class="flex gap-2 pt-2">
+      <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 transition-all">
+        Simpan
+      </button>
+      <a href="/tugas" class="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent h-9 px-4 transition-all">
+        Batal
+      </a>
+    </div>
+  </form>
+</div>
+<%- include('../partials/footer') %>

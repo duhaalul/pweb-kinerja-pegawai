@@ -1,0 +1,113 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h2>Monitoring Penugasan</h2>
+    <p>Pantau dan kelola status semua tugas pegawai</p>
+  </div>
+</div>
+
+<form method="GET" class="filter-bar">
+  <input type="text" name="search" value="<%= search %>" placeholder="Cari judul atau pegawai..." class="form-input" style="width:240px"/>
+  <select name="status" class="form-select" style="width:160px">
+    <option value="">Semua Status</option>
+    <option value="assigned" <%= statusFilter==='assigned'?'selected':'' %>>Assigned</option>
+    <option value="in_progress" <%= statusFilter==='in_progress'?'selected':'' %>>In Progress</option>
+    <option value="completed" <%= statusFilter==='completed'?'selected':'' %>>Selesai</option>
+    <option value="cancelled" <%= statusFilter==='cancelled'?'selected':'' %>>Dibatalkan</option>
+  </select>
+  <button type="submit" class="btn btn-primary">Filter</button>
+  <a href="/dashboard/monitoring" class="btn btn-outline">Reset</a>
+</form>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Judul</th>
+          <th>Pegawai</th>
+          <th>Prioritas</th>
+          <th>Tenggat</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% tugas.forEach(t => { %>
+        <tr>
+          <td class="td-bold">
+            <a href="/tugas/<%= t.id %>/detail" style="color:var(--text);text-decoration:none"><%= t.title %></a>
+          </td>
+          <td class="td-muted"><%= t.assigned_to_name || '—' %></td>
+          <td>
+            <span class="badge <%= t.priority==='high'?'badge-danger':t.priority==='medium'?'badge-warning':'badge-success' %>">
+              <%= t.priority==='high'?'Tinggi':t.priority==='medium'?'Sedang':'Rendah' %>
+            </span>
+          </td>
+          <td class="td-muted"><%= t.due_date ? new Date(t.due_date).toLocaleDateString('id-ID') : '—' %></td>
+          <td>
+            <span class="badge <%= t.status==='completed'?'badge-success':t.status==='in_progress'?'badge-accent':t.status==='cancelled'?'badge-danger':'badge-gray' %>">
+              <%= t.status==='completed'?'Selesai':t.status==='in_progress'?'Berjalan':t.status==='cancelled'?'Dibatalkan':'Assigned' %>
+            </span>
+          </td>
+          <td>
+            <div class="btn-group">
+              <a href="/tugas/<%= t.id %>/detail" class="btn btn-outline btn-xs">Detail</a>
+              <% if (t.status === 'in_progress') { %>
+              <form action="/tugas/<%= t.id %>/selesai" method="POST">
+                <button type="submit" class="btn btn-success btn-xs">✓ Selesai</button>
+              </form>
+              <button class="btn btn-orange btn-xs" onclick="bukaRevisi('<%= t.id %>')">Revisi</button>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+        <% if (tugas.length === 0) { %>
+        <tr>
+          <td colspan="6">
+            <div class="empty-state"><p>Tidak ada data penugasan.</p></div>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (totalPages > 1) { %>
+<div class="pagination">
+  <% for(let i=1; i<=totalPages; i++) { %>
+  <a href="?page=<%= i %>&search=<%= search %>&status=<%= statusFilter %>" class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
+  <% } %>
+</div>
+<% } %>
+
+<div class="modal-overlay" id="modalRevisi">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Kirim Catatan Revisi</h3>
+      <button class="modal-close" onclick="tutupRevisi()">×</button>
+    </div>
+    <form id="formRevisi" method="POST">
+      <input type="hidden" name="progress_id" value="0"/>
+      <div class="form-group">
+        <label class="form-label">Catatan Revisi <span class="req">*</span></label>
+        <textarea name="catatan" class="form-textarea" required placeholder="Tuliskan catatan revisi untuk pegawai..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-orange">Kirim</button>
+        <button type="button" class="btn btn-outline" onclick="tutupRevisi()">Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function bukaRevisi(id) { document.getElementById('formRevisi').action='/tugas/'+id+'/revisi'; document.getElementById('modalRevisi').classList.add('open'); }
+function tutupRevisi() { document.getElementById('modalRevisi').classList.remove('open'); }
+document.getElementById('modalRevisi').addEventListener('click',function(e){if(e.target===this)tutupRevisi();});
+</script>
+
+<%- include('../partials/footer') %>

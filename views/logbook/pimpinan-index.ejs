@@ -1,0 +1,77 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h2>Logbook Pegawai</h2>
+    <p>Review dan setujui logbook harian pegawai</p>
+  </div>
+  <a href="/logbook/export/pdf?employee_id=<%= filterEmployee %>&date=<%= filterDate %>&date_end=<%= filterDateEnd %>" class="btn btn-outline">↓ Export PDF</a>
+</div>
+
+<form method="GET" class="filter-bar">
+  <input type="text" name="search" value="<%= search %>" placeholder="Cari kegiatan / pegawai..." class="form-input" style="width:220px"/>
+  <select name="employee_id" class="form-select" style="width:180px">
+    <option value="">Semua Pegawai</option>
+    <% employees.forEach(e => { %>
+    <option value="<%= e.id %>" <%= filterEmployee==e.id?'selected':'' %>><%= e.name %></option>
+    <% }) %>
+  </select>
+  <input type="date" name="date" value="<%= filterDate %>" class="form-input" style="width:148px" title="Dari tanggal"/>
+  <input type="date" name="date_end" value="<%= filterDateEnd %>" class="form-input" style="width:148px" title="Sampai tanggal"/>
+  <button type="submit" class="btn btn-primary">Filter</button>
+  <a href="/logbook/pimpinan" class="btn btn-outline">Reset</a>
+</form>
+
+<div class="card">
+  <div class="item-list">
+    <% logbooks.forEach(lb => { %>
+    <div class="item-row" style="align-items:flex-start">
+      <div class="item-info">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+          <span style="font-weight:600;font-size:13.5px"><%= lb.employee_name || '—' %></span>
+          <span style="color:var(--text-3);font-size:12px">
+            <%= new Date(lb.progress_date).toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) %>
+          </span>
+          <span class="badge <%= lb.status==='completed'?'badge-success':'badge-warning' %>">
+            <%= lb.status==='completed'?'Disetujui':'Pending' %>
+          </span>
+        </div>
+        <p style="font-size:13.5px;color:var(--text-2);white-space:pre-line;line-height:1.6"><%= lb.description %></p>
+        <% if (lb.attachment) { %>
+        <a href="/uploads/<%= lb.attachment %>" target="_blank"
+          style="font-size:12px;color:var(--accent);margin-top:6px;display:inline-flex;align-items:center;gap:4px;text-decoration:none">
+          ↓ Lampiran
+        </a>
+        <% } %>
+      </div>
+      <% if (lb.status !== 'completed') { %>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:170px">
+        <form action="/logbook/<%= lb.id %>/approve" method="POST">
+          <button type="submit" class="btn btn-success btn-sm" style="width:100%">✓ Setujui</button>
+        </form>
+        <form action="/logbook/<%= lb.id %>/reject" method="POST" style="display:flex;flex-direction:column;gap:6px">
+          <input type="text" name="catatan" placeholder="Catatan penolakan..." required
+            class="form-input" style="height:32px;font-size:12px"/>
+          <button type="submit" class="btn btn-danger btn-sm">✕ Tolak</button>
+        </form>
+      </div>
+      <% } %>
+    </div>
+    <% }) %>
+    <% if (logbooks.length === 0) { %>
+    <div class="empty-state"><p>Tidak ada logbook ditemukan.</p></div>
+    <% } %>
+  </div>
+</div>
+
+<% if (totalPages > 1) { %>
+<div class="pagination">
+  <% for(let i=1; i<=totalPages; i++) { %>
+  <a href="?page=<%= i %>&search=<%= search %>&employee_id=<%= filterEmployee %>&date=<%= filterDate %>&date_end=<%= filterDateEnd %>"
+    class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
+  <% } %>
+</div>
+<% } %>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,72 @@
+<%- include('../partials/head') %>
+<%- include('../partials/navbar') %>
+
+<div class="hero-banner">
+  <div class="hero-eyebrow">Panel Pegawai</div>
+  <h2>Selamat Datang, <%= user.name.split(' ')[0] %></h2>
+  <p>Pantau tugas yang diberikan, kumpulkan hasil kerja, dan catat aktivitas harianmu di logbook.</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue">📋</div>
+    <div class="stat-data">
+      <div class="stat-label">Total Tugas</div>
+      <div class="stat-value"><%= stats.myTugas %></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">✓</div>
+    <div class="stat-data">
+      <div class="stat-label">Selesai</div>
+      <div class="stat-value" style="color:var(--success)"><%= stats.mySelesai %></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">◎</div>
+    <div class="stat-data">
+      <div class="stat-label">Sedang Berjalan</div>
+      <div class="stat-value" style="color:var(--accent)"><%= stats.myProses %></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple">▤</div>
+    <div class="stat-data">
+      <div class="stat-label">Logbook Saya</div>
+      <div class="stat-value"><%= stats.myLogbook %></div>
+    </div>
+  </div>
+</div>
+
+<div class="btn-group" style="margin-bottom:24px">
+  <a href="/tugas/pegawai" class="btn btn-primary">Lihat Tugas Saya</a>
+  <a href="/logbook/create" class="btn btn-outline">+ Tambah Logbook</a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3>Tugas Terbaru</h3>
+    <a href="/tugas/pegawai">Lihat semua →</a>
+  </div>
+  <div class="item-list">
+    <% recentTugas.forEach(t => { %>
+    <div class="item-row">
+      <div class="item-info">
+        <div class="item-title"><%= t.title %></div>
+        <div class="item-meta">Dari: <%= t.assigned_by_name || '—' %></div>
+      </div>
+      <div class="item-actions">
+        <span class="badge <%= t.status==='completed'?'badge-success':t.status==='in_progress'?'badge-accent':'badge-gray' %>">
+          <%= t.status==='completed'?'Selesai':t.status==='in_progress'?'Berjalan':'Assigned' %>
+        </span>
+        <a href="/tugas/<%= t.id %>/detail" class="btn btn-outline btn-xs">Detail</a>
+      </div>
+    </div>
+    <% }) %>
+    <% if (recentTugas.length === 0) { %>
+    <div class="empty-state"><p>Belum ada tugas yang diberikan.</p></div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

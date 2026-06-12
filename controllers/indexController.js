@@ -1,51 +1,50 @@
-const bcrypt = require("bcryptjs");
-const db = require("../lib/db");
+const bcrypt = require('bcryptjs');
+const db = require('../lib/db');
 
 const index = (req, res) => {
-  res.render("index", { title: "Express" });
-};
-
-const home = (req, res) => {
-  res.render("home", { title: "Home", user: req.session.username });
+  if (req.session.userId) return res.redirect('/dashboard');
+  res.redirect('/login');
 };
 
 const loginPage = (req, res) => {
-  if (req.session.userId) {
-    return res.redirect("/home");
-  }
-  res.render("login", { title: "Login", error: null });
+  if (req.session.userId) return res.redirect('/dashboard');
+  res.render('login', { title: 'Login', error: req.session.flashError || null });
+  delete req.session.flashError;
 };
 
 const login = async (req, res, next) => {
   const { username, password } = req.body;
-
+  if (!username || !password) {
+    req.session.flashError = 'Username dan password wajib diisi.';
+    return res.redirect('/login');
+  }
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [
-      username,
-    ]);
-
+    const [rows] = await db.query('SELECT * FROM users WHERE name = ?', [username]);
     if (rows.length === 0) {
-      return res.render("login", {
-        title: "Login",
-        error: "Invalid username or password",
-      });
+      req.session.flashError = 'Username atau password salah.';
+      return res.redirect('/login');
     }
-
     const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
-      return res.render("login", {
-        title: "Login",
-        error: "Invalid username or password",
-      });
+      req.session.flashError = 'Username atau password salah.';
+      return res.redirect('/login');
     }
 
-    // Set session
-    req.session.userId = user.id;
-    req.session.username = user.username;
+    const [roleRows] = await db.query(
+      `SELECT r.name FROM roles r
+       JOIN model_has_roles mhr ON r.id = mhr.role_id
+       WHERE mhr.model_id = ? AND mhr.model_type = 'App\\\\Models\\\\User'`,
+      [user.id]
+    );
+    const role = roleRows.length > 0 ? roleRows[0].name : 'pegawai';
 
-    res.redirect("/home");
+    req.session.userId = user.id;
+    req.session.userName = user.name;
+    req.session.userEmail = user.email;
+    req.session.userRole = role;
+
+    res.redirect('/dashboard');
   } catch (err) {
     next(err);
   }
@@ -53,17 +52,9 @@ const login = async (req, res, next) => {
 
 const logout = (req, res, next) => {
   req.session.destroy((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/login");
+    if (err) return next(err);
+    res.redirect('/login');
   });
 };
 
-module.exports = {
-  index,
-  home,
-  loginPage,
-  login,
-  logout
-};
+module.exports = { index, loginPage, login, logout };
